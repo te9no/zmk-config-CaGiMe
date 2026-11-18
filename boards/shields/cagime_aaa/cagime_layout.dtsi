@@ -14,9 +14,7 @@
 		RC( 0, 4)  RC( 1, 4)  RC( 2, 4)             RC( 3, 4)  RC( 5, 4)     RC( 5,10)  RC( 3,10)             RC( 2,10)  RC( 1,10)  RC( 0,10)
                  RC( 3, 5)  RC( 2, 5)  RC( 4, 5)  RC( 1, 5)  RC( 0, 5)     RC( 1,11)  RC( 3,11)  RC( 4,11)  RC( 0,11)  RC( 2,11)
       RC( 6, 0)                                                            RC( 6, 6)
-#ifdef CGM_HAS_INNER_KEYS
       RC( 6, 1)                                                            RC( 6, 7)
-#endif
 		>;
 	};
 
@@ -85,10 +83,8 @@
             , <&key_physical_attrs  50  50  975  375       0     0     0>
             , <&key_physical_attrs 100 100  335  300       0     0     0>
             , <&key_physical_attrs 100 100 1260  300       0     0     0>
-#ifdef CGM_HAS_INNER_KEYS
             , <&key_physical_attrs 100 100  680  450   0     0     0>
             , <&key_physical_attrs 100 100  920  450   0     0     0>
-#endif
             ;
 	};
 };

@@ -1,7 +1,0 @@
-include:
-  - board: xiao_ble//zmk
-    shield: cagime_aaa_left cagime_aaa_left_j5
-    artifact-name: cagime-aaa-r01-modules-left
-  - board: xiao_ble//zmk
-    shield: cagime_aaa_right
-    artifact-name: cagime-aaa-r01-modules-right

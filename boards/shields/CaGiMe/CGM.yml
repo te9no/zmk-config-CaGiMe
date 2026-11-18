@@ -1,8 +1,0 @@
-file_format: "1"
-id: CGM
-name: CaGiMe
-type: shield
-url: https://github.com/Modulable-Keyboard-Developer/zmk-config-CaGiMe
-requires: [seeeduino_xiao_ble]
-features:
-  - keys

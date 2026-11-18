@@ -23,11 +23,11 @@ CaGiMe は、左右それぞれの下側と中央に拡張モジュールを取�
 <details>
 <summary>開発用ワークスペースで UF2 をビルドする</summary>
 
-AAA R01 用の依存関係をセットアップ済みの `zmk-workspace2` で、このリポジトリを `config/zmk-config-CaGiMe` に配置し、ワークスペース直下から実行します。[依存モジュールとリビジョン](west-aaa-r01.yml) · [左右のビルド定義](build-aaa-r01-studio.yaml)
+AAA R01 用の依存関係をセットアップ済みの `zmk-workspace2` で、このリポジトリを `config/zmk-config-CaGiMe` に配置し、ワークスペース直下から実行します。[依存モジュールとリビジョン](config/west.yml) · [左右のビルド定義](build.yaml)
 
 ~~~sh
 ZMK_CONFIG_ROOT=config/zmk-config-CaGiMe \
-ZMK_BUILD_MATRIX=build-aaa-r01-studio.yaml \
+ZMK_BUILD_MATRIX=build.yaml \
 ZMK_CONFIG_NAME=cagime \
 ZMK_FIRMWARE_TEST_PURPOSE=zeroshift-config-r01 \
 ./just.sh --profile cagime-aaa-r01 build-parallel cagime-aaa-r01-studio 2

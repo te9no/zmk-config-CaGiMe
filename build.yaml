@@ -1,70 +1,9 @@
----
 include:
-# # Left Shields / Default
-#   - board: seeeduino_xiao_ble
-#     shield: CGM_L_Base CGM_L_TB rgbled_adapter nice_oled
-#     snippet: Default zmk-usb-logging studio-rpc-usb-uart
-#     artifact-name: CGM_L_MODULE_TB
-
-  # - board: seeeduino_xiao_ble
-  #   shield: CGM_L_Base CGM_L_JOY rgbled_adapter nice_oled
-  #   snippet: Default zmk-usb-logging studio-rpc-usb-uart
-  #   artifact-name: CGM_L_MODULE_JOY
-
-  # - board: seeeduino_xiao_ble
-  #   shield: CGM_L_Base CGM_L_ENC rgbled_adapter nice_oled
-  #   snippet: Default zmk-usb-logging studio-rpc-usb-uart
-  #   artifact-name: CGM_L_MODULE_ENC
-
-  # - board: seeeduino_xiao_ble
-  #   shield: CGM_L_Base CGM_L_TPD rgbled_adapter nice_oled
-  #   snippet: Default zmk-usb-logging studio-rpc-usb-uart
-  #   artifact-name: CGM_L_MODULE_TPD
-
-  # - board: seeeduino_xiao_ble
-  #   shield: CGM_L_Base CGM_L_KEY rgbled_adapter nice_oled
-  #   snippet: Default zmk-usb-logging studio-rpc-usb-uart
-  #   artifact-name: CGM_L_MODULE_KEY
-
-# Left Shields / Default / with IQS Module
-  - board: seeeduino_xiao_ble
-    shield: CGM_L_Base CGM_L_TB rgbled_adapter 
-    snippet: Default IQS zmk-usb-logging studio-rpc-usb-uart
-    artifact-name: CGM_L_MODULE_TB_IQS
-
-# # Right Shields
-#   - board: seeeduino_xiao_ble
-#     shield: CGM_R_Base CGM_R_TB rgbled_adapter nice_oled
-#     snippet: zmk-usb-logging studio-rpc-usb-uart
-#     artifact-name: CGM_R_MODULE_TB
-    
-  # - board: seeeduino_xiao_ble
-  #   shield: CGM_R_Base CGM_R_JOY rgbled_adapter nice_oled
-  #   snippet: zmk-usb-logging studio-rpc-usb-uart
-  #   artifact-name: CGM_R_MODULE_JOY
-
-  # - board: seeeduino_xiao_ble
-  #   shield: CGM_R_Base CGM_R_ENC rgbled_adapter nice_oled
-  #   snippet: zmk-usb-logging studio-rpc-usb-uart
-  #   artifact-name: CGM_R_MODULE_ENC
-
-  # - board: seeeduino_xiao_ble
-  #   shield: CGM_R_Base CGM_R_TPD rgbled_adapter nice_oled
-  #   snippet: zmk-usb-logging studio-rpc-usb-uart
-  #   artifact-name: CGM_R_MODULE_TPD
-
-  # - board: seeeduino_xiao_ble
-  #   shield: CGM_R_Base CGM_R_KEY rgbled_adapter nice_oled
-  #   snippet: zmk-usb-logging studio-rpc-usb-uart
-  #   artifact-name: CGM_R_MODULE_KEY
-
-# Right Shields / with IQS Module
-  - board: seeeduino_xiao_ble
-    shield: CGM_R_Base CGM_R_TB rgbled_adapter nice_oled
-    snippet: IQS zmk-usb-logging studio-rpc-usb-uart
-    artifact-name: CGM_R_MODULE_TB_IQS
-
-# Settings Reset
-  - board: seeeduino_xiao_ble
-    shield: settings_reset
-
+  - board: xiao_ble//zmk
+    shield: cagime_aaa_left cagime_aaa_left_j5
+    snippet: cagime-studio
+    artifact-name: cagime-aaa-r01-studio-left
+  - board: xiao_ble//zmk
+    shield: cagime_aaa_right
+    snippet: cagime-relay
+    artifact-name: cagime-aaa-r01-studio-right

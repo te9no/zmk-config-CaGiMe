@@ -3,8 +3,7 @@
 #include <input/processors.dtsi>
 #include <dt-bindings/zmk/input_transform.h>
 #include <zephyr/dt-bindings/adc/nrf-saadc.h>
-#define CGM_HAS_INNER_KEYS
-#include "../CaGiMe/CGM-layout.dtsi"
+#include "cagime_layout.dtsi"
 
 / {
     chosen {
