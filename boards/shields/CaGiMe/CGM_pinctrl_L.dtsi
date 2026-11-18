@@ -1,0 +1,22 @@
+#include "CGM_pins.dtsi"
+
+&pinctrl {    
+    Oled_i2c0_default: Oled_i2c0_default {
+        group1 {
+            psels = <OLED_I2C1_SDA>,
+                    <OLED_I2C1_SCL>;
+            bias-pull-up;
+        };
+    };
+      
+    Oled_i2c0_sleep: Oled_i2c0_sleep {
+        group1 {
+            psels = <OLED_I2C1_SDA>,
+                    <OLED_I2C1_SCL>;
+            low-power-enable;
+            bias-pull-up;
+        };
+    };
+};
+
+
