@@ -5,7 +5,8 @@
 	default_transform: keymap_transform_0 {
 		compatible = "zmk,matrix-transform";
 		columns = <12>;
-		rows = <5>;
+		/* Row 6 contains the optional FPC key positions. */
+		rows = <7>;
 
 		map = <
 		RC( 1, 0)  RC( 2, 0)  RC( 3, 0)  RC( 4, 0)  RC( 5, 0)  RC( 2, 1)     RC( 2, 7)  RC( 5, 6)  RC( 4, 6)  RC( 3, 6)  RC( 2, 6)  RC( 1, 6)
@@ -18,9 +19,9 @@
 		>;
 	};
 
-	layout_MKB: layout_MKB {
+	cagime_layout: physical_layout {
 		compatible = "zmk,physical-layout";
-		display-name = "MKB";
+		display-name = "CaGiMe";
 		transform = <&default_transform>;
 		kscan = <&kscan0>;
 		

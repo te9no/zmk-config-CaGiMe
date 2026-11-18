@@ -7,7 +7,7 @@
 
 / {
     chosen {
-        zmk,physical-layout = &layout_MKB;
+        zmk,physical-layout = &cagime_layout;
         /delete-property/ zmk,battery;
     };
 
@@ -52,15 +52,6 @@
             max-channel-value = <4>;
         };
     };
-};
-
-&layout_MKB {
-    display-name = "CaGiMe";
-};
-
-&default_transform {
-    /* Row 6 is reserved for the two optional FPC direct-key positions. */
-    rows = <7>;
 };
 
 /* IO_1 and IO_3 share the NFC pins. */
