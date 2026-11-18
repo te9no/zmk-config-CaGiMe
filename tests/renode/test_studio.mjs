@@ -8,8 +8,8 @@ import {moduleSession} from "../../studio-web/dist/rpc.mjs";
 
 const socket = net.connect(Number(process.argv[2]), "127.0.0.1");
 await once(socket, "connect");
-const transport = process.env.CAGIME_TEST_WEB_BLUETOOTH === "1"
-  ? await (await import("./bluetooth_fixture.mjs")).bluetoothFixture(socket)
+const transport = process.env.CAGIME_TEST_WEB_WIRELESS === "1"
+  ? await (await import("./wireless_fixture.mjs")).wirelessFixture(socket)
   : {...Duplex.toWeb(socket), abortController: new AbortController()};
 const session = moduleSession(transport);
 const monitor = createInterface({input: process.stdin, output: process.stdout});

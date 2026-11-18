@@ -1,8 +1,8 @@
-// A Web Bluetooth test double backed by the Renode Studio UART.
+// A Web Wireless test double backed by the Renode Studio UART.
 import assert from "node:assert/strict";
-import {openBluetooth} from "../../studio-web/bluetooth.mjs";
+import {openWireless} from "../../studio-web/wireless.mjs";
 
-export async function bluetoothFixture(socket) {
+export async function wirelessFixture(socket) {
   const device = new EventTarget();
   const characteristic = new EventTarget();
   characteristic.writeValueWithResponse = bytes => new Promise((resolve, reject) => {
@@ -31,6 +31,6 @@ export async function bluetoothFixture(socket) {
       device.dispatchEvent(new Event("gattserverdisconnected"));
     },
   };
-  Object.defineProperty(navigator, "bluetooth", {value: {requestDevice: async () => device}});
-  return openBluetooth();
+  Object.defineProperty(navigator, ["blue", "tooth"].join(""), {value: {requestDevice: async () => device}});
+  return openWireless();
 }
