@@ -12,6 +12,7 @@
 #include <zmk/matrix_transform.h>
 
 #include "cagime_stick.h"
+#include "dial_degrees.h"
 #include "modules_profile.h"
 
 LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
@@ -22,6 +23,9 @@ enum module_mode { MODULE_OFF, MODULE_PMW3610, MODULE_LPPS, MODULE_ENCODER, MODU
 enum slot_index { LOWER_SLOT, INNER_SLOT };
 
 struct module_slot {
+    uint8_t row, column, sensor_index;
+    bool has_stick;
+    int32_t counts_per_turn;
     const struct device *bus;
     const struct device *pmw3610;
     const struct device *encoder;
@@ -33,29 +37,24 @@ struct module_slot {
     const struct device *lpps_axes;
 };
 
+#define SOCKET_DEVICE(n, prop) DEVICE_DT_GET_OR_NULL(DT_PHANDLE(n, prop))
+#define SOCKET_BUS(n, prop) DEVICE_DT_GET_OR_NULL(DT_BUS(DT_PHANDLE(n, prop)))
+#define SOCKET(n) { \
+    .row = DT_PROP(n, matrix_row), .column = DT_PROP(n, matrix_column), \
+    .sensor_index = DT_PROP(n, sensor_index), .has_stick = DT_PROP(n, has_stick), \
+    .bus = SOCKET_BUS(n, trackball), .pmw3610 = SOCKET_DEVICE(n, trackball), \
+    .encoder = SOCKET_DEVICE(n, encoder), .key = SOCKET_DEVICE(n, push_key), \
+    .pat_bus = SOCKET_BUS(n, optical_dial), .pat = SOCKET_DEVICE(n, optical_dial), \
+    .counts_per_turn = DT_PROP_OR(n, counts_per_revolution, 0), \
+    .lpps_bus = SOCKET_BUS(n, lpps_adc), .lpps_adc = SOCKET_DEVICE(n, lpps_adc), \
+    .lpps_axes = SOCKET_DEVICE(n, lpps_axes), \
+}
+
+#define LOWER DT_NODELABEL(lower_socket)
+#define INNER DT_NODELABEL(inner_socket)
 static const struct module_slot slots[] = {
-    [LOWER_SLOT] = {
-        .bus = DEVICE_DT_GET(DT_NODELABEL(cagime_lower_bus)),
-        .pmw3610 = DEVICE_DT_GET(DT_NODELABEL(cagime_lower_pmw)),
-        .encoder = DEVICE_DT_GET(DT_NODELABEL(cagime_lower_encoder)),
-        .pat_bus = DEVICE_DT_GET_OR_NULL(DT_NODELABEL(cagime_lower_pat_bus)),
-        .pat = DEVICE_DT_GET_OR_NULL(DT_NODELABEL(cagime_lower_pat)),
-        .lpps_bus = DEVICE_DT_GET_OR_NULL(DT_NODELABEL(spi2)),
-        .lpps_adc = DEVICE_DT_GET_OR_NULL(DT_NODELABEL(cagime_lower_lpps_adc)),
-        .lpps_axes = DEVICE_DT_GET_OR_NULL(DT_NODELABEL(cagime_lower_lpps_axes)),
-        .key = DEVICE_DT_GET(DT_NODELABEL(cagime_lower_key)),
-    },
-    [INNER_SLOT] = {
-        .bus = DEVICE_DT_GET_OR_NULL(DT_NODELABEL(cagime_inner_bus)),
-        .pmw3610 = DEVICE_DT_GET_OR_NULL(DT_NODELABEL(cagime_inner_pmw)),
-        .encoder = DEVICE_DT_GET_OR_NULL(DT_NODELABEL(cagime_inner_encoder)),
-        .pat_bus = DEVICE_DT_GET_OR_NULL(DT_NODELABEL(cagime_inner_pat_bus)),
-        .pat = DEVICE_DT_GET_OR_NULL(DT_NODELABEL(cagime_inner_pat)),
-        .lpps_bus = DEVICE_DT_GET_OR_NULL(DT_NODELABEL(spi0)),
-        .lpps_adc = DEVICE_DT_GET_OR_NULL(DT_NODELABEL(cagime_lpps_adc)),
-        .lpps_axes = DEVICE_DT_GET_OR_NULL(DT_NODELABEL(cagime_lpps_axes)),
-        .key = DEVICE_DT_GET_OR_NULL(DT_NODELABEL(cagime_inner_key)),
-    },
+    [LOWER_SLOT] = SOCKET(LOWER),
+    [INNER_SLOT] = SOCKET(INNER),
 };
 
 static const char *const mode_names[] = {
@@ -77,10 +76,9 @@ static void module_key_event(struct input_event *event, void *user_data) {
         return;
     }
 
-    /* The layout keeps lower positions in row 6, column 0, and inner in column 1. */
-    uint32_t column = event->dev == slots[LOWER_SLOT].key ? 0 : 1;
+    const struct module_slot *slot = user_data;
     int32_t position = zmk_matrix_transform_row_column_to_position(
-        ZMK_MATRIX_TRANSFORM_T_FOR_NODE(DT_NODELABEL(default_transform)), 6, column);
+        ZMK_MATRIX_TRANSFORM_T_FOR_NODE(DT_NODELABEL(default_transform)), slot->row, slot->column);
     if (position < 0) {
         return;
     }
@@ -102,12 +100,7 @@ static void module_encoder_event(const struct device *dev, const struct sensor_t
         return;
     }
 
-    /* Preserve the original lower encoder indexes, then append the two inner encoders. */
-    uint8_t index = IS_ENABLED(CONFIG_SHIELD_CAGIME_AAA_RIGHT);
-    if (dev == slots[INNER_SLOT].encoder || dev == slots[INNER_SLOT].pat) {
-        index += 2;
-    }
-
+    uint8_t index = slots[dev == slots[INNER_SLOT].encoder ? INNER_SLOT : LOWER_SLOT].sensor_index;
     raise_zmk_sensor_event((struct zmk_sensor_event){
         .sensor_index = index,
         .channel_data_size = 1,
@@ -125,11 +118,37 @@ static int start_encoder(const struct device *dev) {
     return err == 0 ? sensor_trigger_set(dev, &trigger, module_encoder_event) : err;
 }
 
-INPUT_CALLBACK_DEFINE_NAMED(DEVICE_DT_GET(DT_NODELABEL(cagime_lower_key)),
-                            module_key_event, NULL, cagime_lower_key);
-#if DT_NODE_EXISTS(DT_NODELABEL(cagime_inner_encoder))
-INPUT_CALLBACK_DEFINE_NAMED(DEVICE_DT_GET(DT_NODELABEL(cagime_inner_key)),
-                            module_key_event, NULL, cagime_inner_key);
+/* The input thread serializes the two optical streams. Each dial keeps its
+ * own signed remainder so slow turns and reversals retain subdegree counts. */
+static int32_t dial_remainders[ARRAY_SIZE(slots)];
+
+static void dial_event(struct input_event *event, void *user_data) {
+    const struct module_slot *slot = user_data;
+    if (event->type != INPUT_EV_REL || event->code != INPUT_REL_X) {
+        return;
+    }
+    int32_t *remainder = &dial_remainders[slot - slots];
+    int32_t degrees = cagime_dial_degrees(event->value, slot->counts_per_turn, remainder);
+    if (degrees != 0) {
+        raise_zmk_sensor_event((struct zmk_sensor_event){
+            .sensor_index = slot->sensor_index,
+            .channel_data_size = 1,
+            .channel_data = {{.value = {.val1 = degrees}, .channel = SENSOR_CHAN_ROTATION}},
+            .timestamp = k_uptime_get(),
+        });
+    }
+}
+
+#define SOCKET_CALLBACKS(node, idx) \
+    BUILD_ASSERT(DT_PROP(node, counts_per_revolution) > 0); \
+    INPUT_CALLBACK_DEFINE_NAMED(SOCKET_DEVICE(node, push_key), module_key_event, \
+                                (void *)&slots[idx], key_##idx); \
+    INPUT_CALLBACK_DEFINE_NAMED(SOCKET_DEVICE(node, optical_dial), dial_event, \
+                                (void *)&slots[idx], dial_##idx)
+
+SOCKET_CALLBACKS(LOWER, LOWER_SLOT);
+#if DT_NODE_HAS_PROP(INNER, optical_dial)
+SOCKET_CALLBACKS(INNER, INNER_SLOT);
 #endif
 
 bool zeroshift_mode_supported(size_t slot, uint8_t mode) {
@@ -145,7 +164,7 @@ bool zeroshift_mode_supported(size_t slot, uint8_t mode) {
     case MODULE_ENCODER:
         return slots[slot].encoder != NULL;
     case MODULE_STICK:
-        return slot == LOWER_SLOT;
+        return slots[slot].has_stick;
     case MODULE_KEY:
         return slots[slot].key != NULL;
     default:
@@ -189,7 +208,7 @@ int zeroshift_start_mode(size_t slot, uint8_t mode) {
         return err ? err : device_init(slots[slot].lpps_axes);
     case MODULE_PAT:
         err = device_init(slots[slot].pat_bus);
-        if (!err) err = start_encoder(slots[slot].pat);
+        if (!err) err = device_init(slots[slot].pat);
         return err ? err : device_init(slots[slot].key);
     case MODULE_ENCODER:
         return start_encoder(slots[slot].encoder);

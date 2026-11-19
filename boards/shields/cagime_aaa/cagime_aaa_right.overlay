@@ -55,3 +55,6 @@
 #include "cagime_pat_slot.dtsi"
 
 &cagime_right_lower_lpps_input { device = <&cagime_lower_lpps_axes>; };
+
+&lower_socket { sensor-index = <1>; };
+&inner_socket { sensor-index = <3>; };

@@ -1,5 +1,5 @@
 if(CONFIG_SHIELD_CAGIME_AAA_LEFT OR CONFIG_SHIELD_CAGIME_AAA_RIGHT)
-  target_sources(app PRIVATE src/cagime_led_test.c src/pat9125.c)
+  target_sources(app PRIVATE src/cagime_led_test.c)
   if(NOT CONFIG_ZMK_SETTINGS_RESET_ON_START)
     target_sources(app PRIVATE src/cagime_modules.c src/cagime_stick.c)
   endif()

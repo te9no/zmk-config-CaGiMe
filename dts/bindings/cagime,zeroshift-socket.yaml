@@ -1,0 +1,31 @@
+# SPDX-License-Identifier: MIT
+description: CaGiMe interchangeable module socket and its stable keymap positions
+compatible: "cagime,zeroshift-socket"
+include: base.yaml
+properties:
+  matrix-row:
+    type: int
+    required: true
+  matrix-column:
+    type: int
+    required: true
+  sensor-index:
+    type: int
+    required: true
+  trackball:
+    type: phandle
+  encoder:
+    type: phandle
+  push-key:
+    type: phandle
+  optical-dial:
+    type: phandle
+  lpps-adc:
+    type: phandle
+  lpps-axes:
+    type: phandle
+  counts-per-revolution:
+    type: int
+    description: Optical dial X counts per full turn
+  has-stick:
+    type: boolean

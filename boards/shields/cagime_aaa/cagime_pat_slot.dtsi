@@ -9,11 +9,13 @@
         scl-gpios = PAT_SCL;
         sda-gpios = PAT_SDA;
         PAT_SENSOR: encoder@75 {
-            compatible = "cagime,pat9125";
+            compatible = "pixart,pat912x";
             zephyr,deferred-init;
             reg = <0x75>;
             motion-gpios = PAT_IRQ;
-            counts-per-revolution = <1892>;
+            res-x-cpi = <1275>;
+            res-y-cpi = <0>;
+            zephyr,axis-x = <INPUT_REL_X>;
             sleep1-enable;
             sleep2-enable;
         };

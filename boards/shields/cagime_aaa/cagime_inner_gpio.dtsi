@@ -16,3 +16,13 @@
         };
     };
 };
+
+&inner_socket {
+    trackball = <&cagime_inner_pmw>;
+    encoder = <&cagime_inner_encoder>;
+    push-key = <&cagime_inner_key>;
+    optical-dial = <&cagime_inner_pat>;
+    counts-per-revolution = <1892>;
+    lpps-adc = <&cagime_lpps_adc>;
+    lpps-axes = <&cagime_lpps_axes>;
+};

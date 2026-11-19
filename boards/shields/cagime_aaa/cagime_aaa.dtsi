@@ -6,6 +6,27 @@
 #include "cagime_layout.dtsi"
 
 / {
+    lower_socket: lower-socket {
+        compatible = "cagime,zeroshift-socket";
+        matrix-row = <6>;
+        matrix-column = <0>;
+        sensor-index = <0>;
+        trackball = <&cagime_lower_pmw>;
+        encoder = <&cagime_lower_encoder>;
+        push-key = <&cagime_lower_key>;
+        optical-dial = <&cagime_lower_pat>;
+        counts-per-revolution = <1892>;
+        lpps-adc = <&cagime_lower_lpps_adc>;
+        lpps-axes = <&cagime_lower_lpps_axes>;
+        has-stick;
+    };
+    inner_socket: inner-socket {
+        compatible = "cagime,zeroshift-socket";
+        matrix-row = <6>;
+        matrix-column = <1>;
+        sensor-index = <2>;
+    };
+
     chosen {
         zmk,physical-layout = &cagime_layout;
         /delete-property/ zmk,battery;
@@ -173,6 +194,10 @@
 
     cagime_stick: lower-stick {
         compatible = "cagime,analog-stick";
+        center-mv = <1600>;
+        deadzone-mv = <88>;
+        mv-per-step = <70>;
+        sample-period-ms = <14>;
         io-channels = <&adc 2>, <&adc 3>;
     };
 

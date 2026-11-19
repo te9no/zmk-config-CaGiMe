@@ -6,6 +6,7 @@
 #include <zmk/split/central.h>
 #endif
 #include "modules_profile.h"
+#include <zeroshift/relay.h>
 LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 
 /* Older peers ignore modes on reads and treat nonzero write as a write.
@@ -31,32 +32,23 @@ ZMK_RELAY_EVENT_PERIPHERAL_TO_CENTRAL(profile_reply, Cma, source)
 
 #if IS_ENABLED(CONFIG_ZMK_SPLIT_ROLE_CENTRAL)
 ZMK_RELAY_EVENT_HANDLE(profile_reply, Cma, source)
-K_MSGQ_DEFINE(replies, sizeof(struct profile_reply), 4, 4);
 
 /* Studio dispatches one request at a time on its dedicated RPC thread. */
 int cagime_remote_profile(const uint8_t *requested, struct zeroshift_state *state, uint16_t *supported) {
-    static uint32_t sequence;
-    struct profile_query query = {.id = ++sequence, .source = ZMK_RELAY_EVENT_SOURCE_SELF,
+    struct profile_query query = {.id = zeroshift_relay_begin(), .source = ZMK_RELAY_EVENT_SOURCE_SELF,
                                   .write = requested ? PROFILE_WRITE_EXTENDED : 0, .modes = {PROFILE_READ_CAPS, 0}};
     if (requested) {
         memcpy(query.modes, requested, sizeof(query.modes));
     }
-    k_msgq_purge(&replies);
     raise_profile_query(query);
-    k_timepoint_t deadline = sys_timepoint_calc(K_SECONDS(2));
-    struct profile_reply reply;
-    while (!k_msgq_get(&replies, &reply, sys_timepoint_timeout(deadline))) {
-        if (reply.id == query.id) {
-            *state = reply.state;
-            *supported = reply.result > 0 ? (uint16_t)reply.result : 0;
-            return MIN(reply.result, 0);
-        }
-    }
-    return -ETIMEDOUT;
+    int result = zeroshift_relay_wait(query.id, state);
+    *supported = result > 0 ? (uint16_t)result : 0;
+    return MIN(result, 0);
 }
 
 static int receive_reply(const zmk_event_t *eh) {
-    k_msgq_put(&replies, as_profile_reply(eh), K_NO_WAIT);
+    const struct profile_reply *reply = as_profile_reply(eh);
+    zeroshift_relay_complete(reply->id, reply->result, &reply->state);
     return ZMK_EV_EVENT_HANDLED;
 }
 ZMK_LISTENER(cagime_profile_reply, receive_reply);

@@ -11,7 +11,13 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 
 #define STICK_NODE DT_NODELABEL(cagime_stick)
 #define STICK_ADC DT_IO_CHANNELS_CTLR_BY_IDX(STICK_NODE, 0)
-#define SAMPLE_PERIOD_MS 14
+#define CENTER_MV DT_PROP(STICK_NODE, center_mv)
+#define DEADZONE_MV DT_PROP(STICK_NODE, deadzone_mv)
+#define MV_PER_STEP DT_PROP(STICK_NODE, mv_per_step)
+#define SAMPLE_PERIOD_MS DT_PROP(STICK_NODE, sample_period_ms)
+
+BUILD_ASSERT(CENTER_MV > DEADZONE_MV && DEADZONE_MV >= 0);
+BUILD_ASSERT(MV_PER_STEP > 0 && SAMPLE_PERIOD_MS > 0);
 
 BUILD_ASSERT(DT_SAME_NODE(STICK_ADC, DT_IO_CHANNELS_CTLR_BY_IDX(STICK_NODE, 1)));
 BUILD_ASSERT(DT_IO_CHANNELS_INPUT_BY_IDX(STICK_NODE, 0) < DT_IO_CHANNELS_INPUT_BY_IDX(STICK_NODE, 1));
@@ -30,11 +36,11 @@ static int32_t stick_delta(const struct adc_dt_spec *axis, int16_t sample) {
     }
 
     /* MeKaBu's nominal center, dead zone, and direction. */
-    int32_t delta = CLAMP(1600 - mv, -1600, 1600);
+    int32_t delta = CLAMP(CENTER_MV - mv, -CENTER_MV, CENTER_MV);
     if (delta > 0) {
-        return MAX(0, delta - 88) / 70;
+        return MAX(0, delta - DEADZONE_MV) / MV_PER_STEP;
     }
-    return MIN(0, delta + 88) / 70;
+    return MIN(0, delta + DEADZONE_MV) / MV_PER_STEP;
 }
 
 static void read_stick(void *unused1, void *unused2, void *unused3) {

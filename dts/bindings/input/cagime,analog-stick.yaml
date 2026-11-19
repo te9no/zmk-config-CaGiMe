@@ -9,3 +9,15 @@ properties:
     type: phandle-array
     required: true
     description: ADC channels, in X then Y order and ascending channel number
+  center-mv:
+    type: int
+    required: true
+  deadzone-mv:
+    type: int
+    required: true
+  mv-per-step:
+    type: int
+    required: true
+  sample-period-ms:
+    type: int
+    required: true
