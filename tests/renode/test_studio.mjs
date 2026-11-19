@@ -4,12 +4,18 @@ import {Duplex} from "node:stream";
 import {once} from "node:events";
 import {createInterface} from "node:readline/promises";
 import {setTimeout as delay} from "node:timers/promises";
-import {moduleSession} from "../../studio-web/dist/rpc.mjs";
+import {resolve} from "node:path";
+import {pathToFileURL} from "node:url";
+
+const studio = process.env.ZEROSHIFT_STUDIO_WEB
+  ? pathToFileURL(resolve(process.env.ZEROSHIFT_STUDIO_WEB) + "/")
+  : new URL("../../../zmk-feature-zeroshift/studio-web/", import.meta.url);
+const {moduleSession} = await import(new URL("dist/rpc.mjs", studio));
 
 const socket = net.connect(Number(process.argv[2]), "127.0.0.1");
 await once(socket, "connect");
 const transport = process.env.CAGIME_TEST_WEB_WIRELESS === "1"
-  ? await (await import("./wireless_fixture.mjs")).wirelessFixture(socket)
+  ? await (await import("./wireless_fixture.mjs")).wirelessFixture(socket, studio)
   : {...Duplex.toWeb(socket), abortController: new AbortController()};
 const session = moduleSession(transport);
 const monitor = createInterface({input: process.stdin, output: process.stdout});

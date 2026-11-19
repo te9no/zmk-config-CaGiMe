@@ -13,7 +13,8 @@ if((CONFIG_SHIELD_CAGIME_AAA_LEFT OR CONFIG_SHIELD_CAGIME_AAA_RIGHT) AND CONFIG_
     set(NANOPB_GENERATE_CPP_APPEND_PATH TRUE)
     set(NANOPB_GENERATE_CPP_STANDALONE OFF)
     zephyr_library()
-    nanopb_generate_cpp(proto_srcs proto_hdrs RELPATH ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/proto/modules.proto)
+    nanopb_generate_cpp(proto_srcs proto_hdrs RELPATH "${ZEPHYR_ZMK_FEATURE_ZEROSHIFT_MODULE_DIR}"
+                        "${ZEPHYR_ZMK_FEATURE_ZEROSHIFT_MODULE_DIR}/proto/modules.proto")
     target_include_directories(${ZEPHYR_CURRENT_LIBRARY} PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
     target_sources(${ZEPHYR_CURRENT_LIBRARY} PRIVATE ${proto_srcs} ${proto_hdrs})
     target_include_directories(app PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/proto)

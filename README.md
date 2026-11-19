@@ -1,6 +1,6 @@
 # CaGiMe
 
-CaGiMe は、左右それぞれの下側と中央に拡張モジュールを取り付けられる分割キーボードです。このリポジトリには、CaGiMe の ZMK 設定、キーマップ、モジュール設定用の Web UI が入っています。
+CaGiMe は、左右それぞれの下側と中央に拡張モジュールを取り付けられる分割キーボードです。このリポジトリには、CaGiMe の ZMK 設定、キーマップ、拡張モジュールの配線・起動設定が入っています。
 
 ## AAA R01 の対応モジュール
 
@@ -39,26 +39,12 @@ ZMK_FIRMWARE_TEST_PURPOSE=zeroshift-config-r01 \
 
 ## Web UI でモジュールを設定する
 
-Node.js 22、npm、Python 3 を用意し、このリポジトリのルートから実行します。
-
-~~~sh
-cd studio-web
-npm ci
-npm run build
-python3 -m http.server 8767 --bind 127.0.0.1 --directory dist
-~~~
-
-Chrome または Edge で [設定画面](http://localhost:8767/) を開きます。**右側を設定するときも、PC の接続先は左側です。**
-
-- **USB** — 左側を PC につなぎ、「USB 接続」から CaGiMe のポートを選びます。
-- **無線** — 左側を PC とペアリングし、USB ケーブルを抜いて無線入力できることを確認します。「無線接続」から CaGiMe を選びます。候補に出ないときは、標準キーマップの左側で A の左にある Esc を押したまま U を押してください。
-
-1. 「設定する側」で左または右を選びます。右を選ぶときは、左右の電源を入れ、両側が通信できる状態にします。
-2. 「下側」「中央側」を実際の装着状態に合わせて選び、「設定を保存」を押します。選択は対象側のフラッシュに保存されます。
-3. **設定した側をリセット**します。左側なら Web UI に再接続し、右側なら左右がつながってから「再読込」を押します。「起動時のドライバー」で適用結果を確認できます。
+[ZeroShift の Web UI と起動・操作手順](https://github.com/te9no/zmk-feature-zeroshift#web-ui)を参照してください。右側の設定も左側経由で行います。
 
 ## 実装と検証
 
 ピン配置とスロットの配線は [CaGiMe のシールド定義](boards/shields/cagime_aaa)、選択可能なモジュールと起動処理は [CaGiMe 側の実装](src/cagime_modules.c) にあります。選択の保存と次回起動時の適用には [ZeroShift](https://github.com/te9no/zmk-feature-zeroshift) を使っています。
 
 Renode で下側 5 択と中央 5 択の組み合わせを左右各 25 通り試験しました。各ケースで保存直後の値を読み戻し、対象側だけを再起動して、選んだドライバーが適用されたことを確認しています。ブラウザーの無線接続 と左右間の通信は模擬接続を使い、実機での USB・無線 通信とモジュールの物理入力は未検証です。[Renode テスト](tests/renode/test_studio.mjs)
+
+Renode の Studio 試験には、上記の Web UI をビルドしてから `ZEROSHIFT_STUDIO_WEB` にその `studio-web` の絶対パスを指定できます。既定では、このリポジトリと同じ親ディレクトリの `zmk-feature-zeroshift/studio-web` を使います。

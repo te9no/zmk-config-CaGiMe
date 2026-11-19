@@ -1,8 +1,8 @@
 // A Web Wireless test double backed by the Renode Studio UART.
 import assert from "node:assert/strict";
-import {openWireless} from "../../studio-web/wireless.mjs";
 
-export async function wirelessFixture(socket) {
+export async function wirelessFixture(socket, studio) {
+  const {openWireless} = await import(new URL("wireless.mjs", studio));
   const device = new EventTarget();
   const characteristic = new EventTarget();
   characteristic.writeValueWithResponse = bytes => new Promise((resolve, reject) => {
