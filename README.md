@@ -19,8 +19,8 @@ PAT は R02 の I²C 版（0x75）に対応します。回転は同じ位置の�
 
 | 書き込み先 | UF2 |
 | --- | --- |
-| 左側（PC に接続する側） | `cagime-aaa-r01-studio-left.uf2` |
-| 右側 | `cagime-aaa-r01-studio-right.uf2` |
+| 左側（PC に接続する側） | [cagime-aaa-r01-studio-left.uf2](https://github.com/te9no/zmk-config-CaGiMe/raw/refs/heads/main/firmware/zmk-config-CaGiMe/main/cagime-aaa-r01-studio-left.uf2) |
+| 右側 | [cagime-aaa-r01-studio-right.uf2](https://github.com/te9no/zmk-config-CaGiMe/raw/refs/heads/main/firmware/zmk-config-CaGiMe/main/cagime-aaa-r01-studio-right.uf2) |
 
 <details>
 <summary>開発用ワークスペースで UF2 をビルドする</summary>

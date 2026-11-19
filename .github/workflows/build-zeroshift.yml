@@ -1,0 +1,29 @@
+name: Build CaGiMe ZeroShift firmware
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - build.yaml
+      - boards/**
+      - config/**
+      - dts/**
+      - snippets/**
+      - src/**
+      - zephyr/**
+      - CMakeLists.txt
+      - .github/workflows/build-zeroshift.yml
+
+jobs:
+  firmware:
+    permissions:
+      contents: write
+      actions: read
+    uses: te9no/zmk-workspace/.github/workflows/build-zmk-firmware.yml@a49f67f5ab5392d45bb3209d68f0f17594f62d9a
+    with:
+      tool_ref: a49f67f5ab5392d45bb3209d68f0f17594f62d9a
+      build_yaml: build.yaml
+      target: all
+      fail_on_no_targets: true
+      commit_firmware: ${{ github.ref == 'refs/heads/main' }}
