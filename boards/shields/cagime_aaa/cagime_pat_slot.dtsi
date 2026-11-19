@@ -1,0 +1,27 @@
+/* PAT9125 R02 uses FPC signal pads 4=SCL, 2=SDA, 3=MOTION, 1=PUSH. */
+/ {
+    PAT_BUS: PAT_NODE {
+        compatible = "gpio-i2c";
+        zephyr,deferred-init;
+        #address-cells = <1>;
+        #size-cells = <0>;
+        clock-frequency = <100000>;
+        scl-gpios = PAT_SCL;
+        sda-gpios = PAT_SDA;
+        PAT_SENSOR: encoder@75 {
+            compatible = "cagime,pat9125";
+            zephyr,deferred-init;
+            reg = <0x75>;
+            motion-gpios = PAT_IRQ;
+            counts-per-revolution = <1892>;
+            sleep1-enable;
+            sleep2-enable;
+        };
+    };
+};
+#undef PAT_BUS
+#undef PAT_NODE
+#undef PAT_SENSOR
+#undef PAT_SCL
+#undef PAT_SDA
+#undef PAT_IRQ

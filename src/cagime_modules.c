@@ -18,7 +18,7 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 
 
 /* Keep the original values in NVS so existing PMW3610 and LPPS settings carry over. */
-enum module_mode { MODULE_OFF, MODULE_PMW3610, MODULE_LPPS, MODULE_ENCODER, MODULE_STICK, MODULE_KEY };
+enum module_mode { MODULE_OFF, MODULE_PMW3610, MODULE_LPPS, MODULE_ENCODER, MODULE_STICK, MODULE_KEY, MODULE_PAT };
 enum slot_index { LOWER_SLOT, INNER_SLOT };
 
 struct module_slot {
@@ -26,6 +26,11 @@ struct module_slot {
     const struct device *pmw3610;
     const struct device *encoder;
     const struct device *key;
+    const struct device *pat_bus;
+    const struct device *pat;
+    const struct device *lpps_bus;
+    const struct device *lpps_adc;
+    const struct device *lpps_axes;
 };
 
 static const struct module_slot slots[] = {
@@ -33,12 +38,22 @@ static const struct module_slot slots[] = {
         .bus = DEVICE_DT_GET(DT_NODELABEL(cagime_lower_bus)),
         .pmw3610 = DEVICE_DT_GET(DT_NODELABEL(cagime_lower_pmw)),
         .encoder = DEVICE_DT_GET(DT_NODELABEL(cagime_lower_encoder)),
+        .pat_bus = DEVICE_DT_GET_OR_NULL(DT_NODELABEL(cagime_lower_pat_bus)),
+        .pat = DEVICE_DT_GET_OR_NULL(DT_NODELABEL(cagime_lower_pat)),
+        .lpps_bus = DEVICE_DT_GET_OR_NULL(DT_NODELABEL(spi2)),
+        .lpps_adc = DEVICE_DT_GET_OR_NULL(DT_NODELABEL(cagime_lower_lpps_adc)),
+        .lpps_axes = DEVICE_DT_GET_OR_NULL(DT_NODELABEL(cagime_lower_lpps_axes)),
         .key = DEVICE_DT_GET(DT_NODELABEL(cagime_lower_key)),
     },
     [INNER_SLOT] = {
         .bus = DEVICE_DT_GET_OR_NULL(DT_NODELABEL(cagime_inner_bus)),
         .pmw3610 = DEVICE_DT_GET_OR_NULL(DT_NODELABEL(cagime_inner_pmw)),
         .encoder = DEVICE_DT_GET_OR_NULL(DT_NODELABEL(cagime_inner_encoder)),
+        .pat_bus = DEVICE_DT_GET_OR_NULL(DT_NODELABEL(cagime_inner_pat_bus)),
+        .pat = DEVICE_DT_GET_OR_NULL(DT_NODELABEL(cagime_inner_pat)),
+        .lpps_bus = DEVICE_DT_GET_OR_NULL(DT_NODELABEL(spi0)),
+        .lpps_adc = DEVICE_DT_GET_OR_NULL(DT_NODELABEL(cagime_lpps_adc)),
+        .lpps_axes = DEVICE_DT_GET_OR_NULL(DT_NODELABEL(cagime_lpps_axes)),
         .key = DEVICE_DT_GET_OR_NULL(DT_NODELABEL(cagime_inner_key)),
     },
 };
@@ -50,6 +65,7 @@ static const char *const mode_names[] = {
     [MODULE_ENCODER] = "encoder",
     [MODULE_STICK] = "stick",
     [MODULE_KEY] = "key",
+    [MODULE_PAT] = "pat9125",
 };
 
 BUILD_ASSERT(ZEROSHIFT_SLOT_COUNT == ARRAY_SIZE(slots));
@@ -88,7 +104,7 @@ static void module_encoder_event(const struct device *dev, const struct sensor_t
 
     /* Preserve the original lower encoder indexes, then append the two inner encoders. */
     uint8_t index = IS_ENABLED(CONFIG_SHIELD_CAGIME_AAA_RIGHT);
-    if (dev == slots[INNER_SLOT].encoder) {
+    if (dev == slots[INNER_SLOT].encoder || dev == slots[INNER_SLOT].pat) {
         index += 2;
     }
 
@@ -123,7 +139,9 @@ bool zeroshift_mode_supported(size_t slot, uint8_t mode) {
     case MODULE_PMW3610:
         return slots[slot].pmw3610 != NULL;
     case MODULE_LPPS:
-        return slot == INNER_SLOT && DT_NODE_EXISTS(DT_NODELABEL(cagime_lpps_axes));
+        return slots[slot].lpps_axes != NULL;
+    case MODULE_PAT:
+        return slots[slot].pat != NULL;
     case MODULE_ENCODER:
         return slots[slot].encoder != NULL;
     case MODULE_STICK:
@@ -133,6 +151,18 @@ bool zeroshift_mode_supported(size_t slot, uint8_t mode) {
     default:
         return false;
     }
+}
+
+uint16_t cagime_supported_modes(void) {
+    uint16_t mask = 0;
+    for (size_t slot = 0; slot < ARRAY_SIZE(slots); slot++) {
+        for (unsigned int mode = 0; mode < ARRAY_SIZE(mode_names); mode++) {
+            if (zeroshift_mode_supported(slot, mode)) {
+                mask |= BIT(slot * 8 + mode);
+            }
+        }
+    }
+    return mask;
 }
 
 static int parse_mode(const char *name, size_t slot) {
@@ -153,15 +183,14 @@ int zeroshift_start_mode(size_t slot, uint8_t mode) {
     case MODULE_PMW3610:
         err = device_init(slots[slot].bus);
         return err == 0 ? device_init(slots[slot].pmw3610) : err;
-#if DT_NODE_EXISTS(DT_NODELABEL(cagime_lpps_axes))
     case MODULE_LPPS:
-        err = device_init(DEVICE_DT_GET(DT_NODELABEL(spi0)));
-        if (err != 0) {
-            return err;
-        }
-        err = device_init(DEVICE_DT_GET(DT_NODELABEL(cagime_lpps_adc)));
-        return err == 0 ? device_init(DEVICE_DT_GET(DT_NODELABEL(cagime_lpps_axes))) : err;
-#endif
+        err = device_init(slots[slot].lpps_bus);
+        if (!err) err = device_init(slots[slot].lpps_adc);
+        return err ? err : device_init(slots[slot].lpps_axes);
+    case MODULE_PAT:
+        err = device_init(slots[slot].pat_bus);
+        if (!err) err = start_encoder(slots[slot].pat);
+        return err ? err : device_init(slots[slot].key);
     case MODULE_ENCODER:
         return start_encoder(slots[slot].encoder);
     case MODULE_STICK:

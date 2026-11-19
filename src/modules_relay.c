@@ -8,6 +8,10 @@
 #include "modules_profile.h"
 LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 
+/* Older peers ignore modes on reads and treat nonzero write as a write.
+ * Extended requests return slot masks as a positive result on success. */
+enum { PROFILE_WRITE_EXTENDED = 2, PROFILE_READ_CAPS = 0xff };
+
 struct profile_query {
     uint32_t id;
     uint8_t source, write, modes[2];
@@ -30,10 +34,10 @@ ZMK_RELAY_EVENT_HANDLE(profile_reply, Cma, source)
 K_MSGQ_DEFINE(replies, sizeof(struct profile_reply), 4, 4);
 
 /* Studio dispatches one request at a time on its dedicated RPC thread. */
-int cagime_remote_profile(const uint8_t *requested, struct zeroshift_state *state) {
+int cagime_remote_profile(const uint8_t *requested, struct zeroshift_state *state, uint16_t *supported) {
     static uint32_t sequence;
     struct profile_query query = {.id = ++sequence, .source = ZMK_RELAY_EVENT_SOURCE_SELF,
-                                  .write = requested != NULL};
+                                  .write = requested ? PROFILE_WRITE_EXTENDED : 0, .modes = {PROFILE_READ_CAPS, 0}};
     if (requested) {
         memcpy(query.modes, requested, sizeof(query.modes));
     }
@@ -44,7 +48,8 @@ int cagime_remote_profile(const uint8_t *requested, struct zeroshift_state *stat
     while (!k_msgq_get(&replies, &reply, sys_timepoint_timeout(deadline))) {
         if (reply.id == query.id) {
             *state = reply.state;
-            return reply.result;
+            *supported = reply.result > 0 ? (uint16_t)reply.result : 0;
+            return MIN(reply.result, 0);
         }
     }
     return -ETIMEDOUT;
@@ -62,6 +67,10 @@ static int receive_query(const zmk_event_t *eh) {
     const struct profile_query *query = as_profile_query(eh);
     struct profile_reply reply = {.id = query->id, .source = ZMK_RELAY_EVENT_SOURCE_SELF};
     reply.result = zeroshift_profile(query->write ? query->modes : NULL, &reply.state);
+    if (reply.result == 0 && (query->write == PROFILE_WRITE_EXTENDED ||
+                             (!query->write && query->modes[0] == PROFILE_READ_CAPS))) {
+        reply.result = cagime_supported_modes();
+    }
     raise_profile_reply(reply);
     return ZMK_EV_EVENT_HANDLED;
 }

@@ -1,0 +1,103 @@
+/* ADS1220 LPPS FPC pads 4 (SCLK), 1 (DIN), 2 (DOUT). */
+&pinctrl {
+    LPPS_DEFAULT: LPPS_DEFAULT {
+        group1 {
+            psels = CAGIME_LPPS_PSELS;
+        };
+    };
+
+    LPPS_SLEEP: LPPS_SLEEP {
+        group1 {
+            psels = CAGIME_LPPS_PSELS;
+            low-power-enable;
+        };
+    };
+};
+
+&LPPS_BUS {
+    status = "okay";
+    zephyr,deferred-init;
+    pinctrl-0 = <&LPPS_DEFAULT>;
+    pinctrl-1 = <&LPPS_SLEEP>;
+    pinctrl-names = "default", "sleep";
+
+    /* CS is strapped on the module. Retain MeKaBu's timed conversion reads. */
+    LPPS_ADC: ads1220@0 {
+        compatible = "ti,ads1220";
+        zephyr,deferred-init;
+        spi-max-frequency = <1000000>;
+        reg = <0>;
+        idac-ua = <100>;
+        pga-bypass;
+        #io-channel-cells = <1>;
+        #address-cells = <1>;
+        #size-cells = <0>;
+
+        channel@0 {
+            reg = <0>;
+            zephyr,resolution = <24>;
+            zephyr,gain = "ADC_GAIN_4";
+            zephyr,reference = "ADC_REF_EXTERNAL0";
+            zephyr,acquisition-time = <330>;
+            zephyr,input-positive = <3>;
+            zephyr,input-negative = <2>;
+            zephyr,current-source-pin = [05 00];
+        };
+
+        channel@1 {
+            reg = <1>;
+            zephyr,resolution = <24>;
+            zephyr,gain = "ADC_GAIN_4";
+            zephyr,reference = "ADC_REF_EXTERNAL0";
+            zephyr,acquisition-time = <330>;
+            zephyr,input-positive = <0>;
+            zephyr,input-negative = <1>;
+            zephyr,current-source-pin = [05 00];
+        };
+    };
+};
+
+/ {
+    LPPS_AXES: LPPS_NODE {
+        compatible = "analog-axis-hires";
+        zephyr,deferred-init;
+        poll-period-downshift-ms = <8 5000 100>;
+
+        axis-x {
+            status = "okay";
+            io-channels = <&LPPS_ADC 0>;
+            in-min = <(-12000)>;
+            in-max = <12000>;
+            in-calib-cycle = <100>;
+            in-deadzone = <1500>;
+            out-min = <(-20)>;
+            out-max = <20>;
+            skip-change-comparator;
+            zephyr,axis-type = <INPUT_EV_REL>;
+            zephyr,axis = <INPUT_REL_X>;
+        };
+
+        axis-y {
+            status = "okay";
+            io-channels = <&LPPS_ADC 1>;
+            in-min = <(-12000)>;
+            in-max = <12000>;
+            in-calib-cycle = <100>;
+            in-deadzone = <1500>;
+            out-min = <(-20)>;
+            out-max = <20>;
+            invert-output;
+            skip-change-comparator;
+            zephyr,axis-type = <INPUT_EV_REL>;
+            zephyr,axis = <INPUT_REL_Y>;
+        };
+    };
+};
+
+#undef LPPS_BUS
+#undef LPPS_DEFAULT
+#undef LPPS_SLEEP
+#undef LPPS_ADC
+#undef LPPS_AXES
+#undef LPPS_NODE
+#undef CAGIME_LPPS_PSELS

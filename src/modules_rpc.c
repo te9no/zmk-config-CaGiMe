@@ -27,9 +27,12 @@ static bool handle(const zmk_custom_CallRequest *raw, pb_callback_t *encode) {
         modes[1] = req.operation.set.inner;
     }
     struct zeroshift_state state;
-    resp->error = req.right ? cagime_remote_profile(write ? modes : NULL, &state)
+    uint16_t supported = cagime_supported_modes();
+    resp->error = req.right ? cagime_remote_profile(write ? modes : NULL, &state, &supported)
                             : zeroshift_profile(write ? modes : NULL, &state);
     if (!resp->error) {
+        resp->has_supported = supported != 0;
+        resp->supported = (cagime_Modes){supported & 0xff, supported >> 8};
         resp->has_saved = resp->has_active = true;
         resp->saved = (cagime_Modes){state.saved[0], state.saved[1]};
         resp->active = (cagime_Modes){state.active[0], state.active[1]};

@@ -45,3 +45,13 @@
 &cagime_right_stick_input {
     device = <&adc>;
 };
+
+#define PAT_BUS cagime_inner_pat_bus
+#define PAT_NODE inner-pat-bus
+#define PAT_SENSOR cagime_inner_pat
+#define PAT_SCL <&gpio0 3 (GPIO_ACTIVE_HIGH | GPIO_OPEN_DRAIN)>
+#define PAT_SDA <&gpio1 5 (GPIO_ACTIVE_HIGH | GPIO_OPEN_DRAIN)>
+#define PAT_IRQ <&gpio0 28 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>
+#include "cagime_pat_slot.dtsi"
+
+&cagime_right_lower_lpps_input { device = <&cagime_lower_lpps_axes>; };

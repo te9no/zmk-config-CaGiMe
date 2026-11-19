@@ -84,7 +84,23 @@
     };
 };
 &i2c1 { status = "disabled"; };
-&spi2 { status = "disabled"; };
+#define CAGIME_LPPS_PSELS <NRF_PSEL(SPIM_SCK, 0, 4)>, <NRF_PSEL(SPIM_MOSI, 1, 12)>, <NRF_PSEL(SPIM_MISO, 1, 13)>
+#define LPPS_BUS spi2
+#define LPPS_DEFAULT cagime_lower_lpps_default
+#define LPPS_SLEEP cagime_lower_lpps_sleep
+#define LPPS_ADC cagime_lower_lpps_adc
+#define LPPS_AXES cagime_lower_lpps_axes
+#define LPPS_NODE lower-lpps-axes
+#include "cagime_lpps_slot.dtsi"
+
+#define PAT_BUS cagime_lower_pat_bus
+#define PAT_NODE lower-pat-bus
+#define PAT_SENSOR cagime_lower_pat
+#define PAT_SCL <&gpio0 4 (GPIO_ACTIVE_HIGH | GPIO_OPEN_DRAIN)>
+#define PAT_SDA <&gpio1 13 (GPIO_ACTIVE_HIGH | GPIO_OPEN_DRAIN)>
+#define PAT_IRQ <&gpio0 5 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>
+#include "cagime_pat_slot.dtsi"
+
 &pwm0 { status = "disabled"; };
 
 &pinctrl {
@@ -177,6 +193,11 @@
         cagime_right_lpps_input: lpps@2 {
             compatible = "zmk,input-split";
             reg = <2>;
+        };
+
+        cagime_right_lower_lpps_input: lpps@4 {
+            compatible = "zmk,input-split";
+            reg = <4>;
         };
 
         cagime_right_stick_input: stick@3 {

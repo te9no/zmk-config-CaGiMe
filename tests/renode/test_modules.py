@@ -102,7 +102,8 @@ def check_shell(process, line_log, terminal, side, legacy):
 
     monitor("start")
     expect("get", state("off off", "off off"), retry=True)
-    expect("set lpps off", "error -22")
+    if legacy:
+        expect("set lpps off", "error -22")
     expect("set off stick", "error -22")
     expect("set unexpected off", "error -22")
     expect("get", state("off off", "off off"))
@@ -110,8 +111,8 @@ def check_shell(process, line_log, terminal, side, legacy):
     lower_modes = ["off", "pmw3610"]
     inner_modes = ["off", "pmw3610", "lpps"]
     if not legacy:
-        lower_modes.extend(("encoder", "stick", "key"))
-        inner_modes.extend(("encoder", "key"))
+        lower_modes.extend(("encoder", "stick", "key", "pat9125", "lpps"))
+        inner_modes.extend(("encoder", "key", "pat9125"))
 
     # End at off/off so it is also verified through a write followed by a reset.
     profiles = [f"{lower} {inner}" for lower, inner in product(lower_modes, inner_modes)]
@@ -120,10 +121,10 @@ def check_shell(process, line_log, terminal, side, legacy):
     for profile in profiles:
         expect(f"set {profile}", state(profile, previous))
         reboot()
-        expect("get", state(profile, profile), retry=True)
-        previous = profile
+        previous = profile.replace("pat9125", "off")
+        expect("get", state(profile, previous), retry=True)
 
-    print(f"{side}: {len(profiles)}/{len(profiles)} configurations saved and applied", flush=True)
+    print(f"{side}: {len(profiles)}/{len(profiles)} saved profiles and reported driver states verified", flush=True)
 
 
 def board_model(renode, legacy=False):

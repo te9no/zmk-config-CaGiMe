@@ -41,11 +41,20 @@ async function readAfterBoot(side) {
 await delay(1500);
 for (const side of ["left", "right"]) {
   let previous = ["off", "off"];
-  check(await readAfterBoot(side), previous, previous);
-  await assert.rejects(session.profile(side, ["lpps", "off"]), /-22/);
+  const initial = await readAfterBoot(side);
+  check(initial, previous, previous);
+  const lower = ["off","pmw3610","encoder","stick","key"];
+  const inner = ["off","pmw3610","lpps","encoder","key"];
+  if (initial.supported) {
+    lower.push("lpps","pat9125");
+    inner.push("pat9125");
+    assert.deepEqual(new Set(initial.supported.lower), new Set(lower));
+    assert.deepEqual(new Set(initial.supported.inner), new Set(inner));
+  } else {
+    await assert.rejects(session.profile(side, ["lpps", "off"]), /-22/);
+  }
   await assert.rejects(session.profile(side, ["off", "stick"]), /-22/);
-  const cases = ["off","pmw3610","encoder","stick","key"].flatMap(lower =>
-    ["off","pmw3610","lpps","encoder","key"].map(inner => [lower, inner]));
+  const cases = lower.flatMap(a => inner.map(b => [a, b]));
   cases.push(cases.shift());
   for (const modes of cases) {
     check(await session.profile(side, modes), modes, previous);
@@ -53,11 +62,13 @@ for (const side of ["left", "right"]) {
       check(await readAfterBoot(side === "left" ? "right" : "left"), ["off", "off"], ["off", "off"]);
     }
     await reset(side);
-    check(await readAfterBoot(side), modes, modes);
+    // Simulated slots have no PAT device to acknowledge the product ID read.
+    const active = modes.map(mode => mode === "pat9125" ? "off" : mode);
+    check(await readAfterBoot(side), modes, active);
     console.log(side, ...modes, "PASS");
-    previous = modes;
+    previous = active;
   }
-  console.log(side, "25/25");
+  console.log(side, cases.length + "/" + cases.length);
 }
 await session.close();
 socket.destroy();

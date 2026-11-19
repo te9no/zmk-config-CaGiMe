@@ -38,3 +38,12 @@
         device = <&cagime_right_lpps_input>;
     };
 };
+
+&cagime_lower_lpps_axes {
+    axis-x { invert-output; };
+    axis-y { /delete-property/ invert-output; };
+};
+/ {
+    left_lower_lpps { compatible = "zmk,input-listener"; device = <&cagime_lower_lpps_axes>; };
+    right_lower_lpps { compatible = "zmk,input-listener"; device = <&cagime_right_lower_lpps_input>; };
+};

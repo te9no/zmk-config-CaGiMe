@@ -38,3 +38,11 @@
         device = <&cagime_lpps_axes>;
     };
 };
+
+#define PAT_BUS cagime_inner_pat_bus
+#define PAT_NODE inner-pat-bus
+#define PAT_SENSOR cagime_inner_pat
+#define PAT_SCL <&gpio1 3 (GPIO_ACTIVE_HIGH | GPIO_OPEN_DRAIN)>
+#define PAT_SDA <&gpio0 28 (GPIO_ACTIVE_HIGH | GPIO_OPEN_DRAIN)>
+#define PAT_IRQ <&gpio1 14 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>
+#include "cagime_pat_slot.dtsi"
