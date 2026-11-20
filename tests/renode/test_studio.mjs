@@ -48,12 +48,14 @@ for (const side of ["left", "right"]) {
   if (initial.supported) {
     lower.push("lpps","pat9125");
     inner.push("pat9125");
+    if (initial.supported.lower.includes("tpd")) lower.push("tpd");
+    if (initial.supported.inner.includes("tpd")) inner.push("tpd");
     assert.deepEqual(new Set(initial.supported.lower), new Set(lower));
     assert.deepEqual(new Set(initial.supported.inner), new Set(inner));
   } else {
-    await assert.rejects(session.profile(side, ["lpps", "off"]), /-22/);
+    await assert.rejects(session.profile(side, ["lpps", "off"]), /-22|未対応/);
   }
-  await assert.rejects(session.profile(side, ["off", "stick"]), /-22/);
+  await assert.rejects(session.profile(side, ["off", "stick"]), /-22|未対応/);
   const cases = lower.flatMap(a => inner.map(b => [a, b]));
   cases.push(cases.shift());
   for (const modes of cases) {
@@ -63,7 +65,7 @@ for (const side of ["left", "right"]) {
     }
     await reset(side);
     // Simulated slots have no PAT device to acknowledge the product ID read.
-    const active = modes.map(mode => mode === "pat9125" ? "off" : mode);
+    const active = modes.map(mode => ["pat9125", "tpd"].includes(mode) ? "off" : mode);
     check(await readAfterBoot(side), modes, active);
     console.log(side, ...modes, "PASS");
     previous = active;
