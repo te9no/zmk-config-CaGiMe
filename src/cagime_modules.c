@@ -19,7 +19,7 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 
 
 /* Keep the original values in NVS so existing PMW3610 and LPPS settings carry over. */
-enum module_mode { MODULE_OFF, MODULE_PMW3610, MODULE_LPPS, MODULE_ENCODER, MODULE_STICK, MODULE_KEY, MODULE_PAT };
+enum module_mode { MODULE_OFF, MODULE_PMW3610, MODULE_LPPS, MODULE_ENCODER, MODULE_STICK, MODULE_KEY, MODULE_PAT, MODULE_CIRQUE };
 enum slot_index { LOWER_SLOT, INNER_SLOT };
 
 struct module_slot {
@@ -30,6 +30,8 @@ struct module_slot {
     const struct device *pmw3610;
     const struct device *encoder;
     const struct device *key;
+    const struct device *pad_bus;
+    const struct device *pad;
     const struct device *pat_bus;
     const struct device *pat;
     const struct device *lpps_bus;
@@ -44,6 +46,7 @@ struct module_slot {
     .sensor_index = DT_PROP(n, sensor_index), .has_stick = DT_PROP(n, has_stick), \
     .bus = SOCKET_BUS(n, trackball), .pmw3610 = SOCKET_DEVICE(n, trackball), \
     .encoder = SOCKET_DEVICE(n, encoder), .key = SOCKET_DEVICE(n, push_key), \
+    .pad_bus = SOCKET_BUS(n, touchpad), .pad = SOCKET_DEVICE(n, touchpad), \
     .pat_bus = SOCKET_BUS(n, optical_dial), .pat = SOCKET_DEVICE(n, optical_dial), \
     .counts_per_turn = DT_PROP_OR(n, counts_per_revolution, 0), \
     .lpps_bus = SOCKET_BUS(n, lpps_adc), .lpps_adc = SOCKET_DEVICE(n, lpps_adc), \
@@ -64,6 +67,7 @@ static const char *const mode_names[] = {
     [MODULE_ENCODER] = "encoder",
     [MODULE_STICK] = "stick",
     [MODULE_KEY] = "key",
+    [MODULE_CIRQUE] = "tpd",
     [MODULE_PAT] = "pat9125",
 };
 
@@ -159,6 +163,8 @@ bool zeroshift_mode_supported(size_t slot, uint8_t mode) {
         return slots[slot].pmw3610 != NULL;
     case MODULE_LPPS:
         return slots[slot].lpps_axes != NULL;
+    case MODULE_CIRQUE:
+        return slots[slot].pad != NULL;
     case MODULE_PAT:
         return slots[slot].pat != NULL;
     case MODULE_ENCODER:
@@ -206,6 +212,9 @@ int zeroshift_start_mode(size_t slot, uint8_t mode) {
         err = device_init(slots[slot].lpps_bus);
         if (!err) err = device_init(slots[slot].lpps_adc);
         return err ? err : device_init(slots[slot].lpps_axes);
+    case MODULE_CIRQUE:
+        err = device_init(slots[slot].pad_bus);
+        return err ? err : device_init(slots[slot].pad);
     case MODULE_PAT:
         err = device_init(slots[slot].pat_bus);
         if (!err) err = device_init(slots[slot].pat);

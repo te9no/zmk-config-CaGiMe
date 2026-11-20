@@ -58,3 +58,13 @@
 
 &lower_socket { sensor-index = <1>; };
 &inner_socket { sensor-index = <3>; };
+
+#define CIRQUE_BUS inner_cirque_bus
+#define CIRQUE_SOCKET inner_socket
+#define CIRQUE_DEVICE inner_cirque
+#define CIRQUE_SDA <&gpio0 3 (GPIO_ACTIVE_HIGH | GPIO_OPEN_DRAIN)>
+#define CIRQUE_SCL <&gpio0 28 (GPIO_ACTIVE_HIGH | GPIO_OPEN_DRAIN)>
+#define CIRQUE_DR <&gpio1 5 GPIO_ACTIVE_HIGH>
+#include "cirque_slot.dtsi"
+&right_lower_pad { device = <&lower_cirque>; };
+&right_inner_pad { device = <&inner_cirque>; };

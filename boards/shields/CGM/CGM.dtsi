@@ -231,3 +231,13 @@
         };
     };
 };
+
+#define CIRQUE_BUS lower_cirque_bus
+#define CIRQUE_SOCKET lower_socket
+#define CIRQUE_DEVICE lower_cirque
+#define CIRQUE_SDA <&gpio0 4 (GPIO_ACTIVE_HIGH | GPIO_OPEN_DRAIN)>
+#define CIRQUE_SCL <&gpio0 5 (GPIO_ACTIVE_HIGH | GPIO_OPEN_DRAIN)>
+#define CIRQUE_DR <&gpio1 13 GPIO_ACTIVE_HIGH>
+#include "cirque_slot.dtsi"
+/ { split_inputs { right_lower_pad: touchpad@5 { compatible = "zmk,input-split"; reg = <5>; }; }; };
+/ { split_inputs { right_inner_pad: touchpad@6 { compatible = "zmk,input-split"; reg = <6>; }; }; };

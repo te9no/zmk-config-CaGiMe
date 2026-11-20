@@ -96,3 +96,15 @@
 #define PAT_SDA <&gpio0 28 (GPIO_ACTIVE_HIGH | GPIO_OPEN_DRAIN)>
 #define PAT_IRQ <&gpio1 14 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>
 #include "cagime_pat_slot.dtsi"
+
+#define CIRQUE_BUS inner_cirque_bus
+#define CIRQUE_SOCKET inner_socket
+#define CIRQUE_DEVICE inner_cirque
+#define CIRQUE_SDA <&gpio1 3 (GPIO_ACTIVE_HIGH | GPIO_OPEN_DRAIN)>
+#define CIRQUE_SCL <&gpio1 14 (GPIO_ACTIVE_HIGH | GPIO_OPEN_DRAIN)>
+#define CIRQUE_DR <&gpio0 28 GPIO_ACTIVE_HIGH>
+#include "cirque_slot.dtsi"
+/ { left_lower_pad { compatible = "zmk,input-listener"; device = <&lower_cirque>; }; };
+/ { right_lower_pad_listener { compatible = "zmk,input-listener"; device = <&right_lower_pad>; }; };
+/ { left_inner_pad { compatible = "zmk,input-listener"; device = <&inner_cirque>; }; };
+/ { right_inner_pad_listener { compatible = "zmk,input-listener"; device = <&right_inner_pad>; }; };

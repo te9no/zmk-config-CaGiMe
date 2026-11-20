@@ -18,6 +18,8 @@ properties:
     type: phandle
   push-key:
     type: phandle
+  touchpad:
+    type: phandle
   optical-dial:
     type: phandle
   lpps-adc:

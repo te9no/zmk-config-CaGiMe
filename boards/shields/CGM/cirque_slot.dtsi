@@ -1,0 +1,26 @@
+/* Cirque FPC signal pads: 4 SDA, 3 SCL, 2 data ready. */
+/ {
+    CIRQUE_BUS: CIRQUE_BUS {
+        compatible = "gpio-i2c";
+        zephyr,deferred-init;
+        #address-cells = <1>;
+        #size-cells = <0>;
+        clock-frequency = <100000>;
+        scl-gpios = CIRQUE_SCL;
+        sda-gpios = CIRQUE_SDA;
+        CIRQUE_DEVICE: touchpad@2a {
+            compatible = "cirque,pinnacle";
+            zephyr,deferred-init;
+            reg = <0x2a>;
+            data-ready-gpios = CIRQUE_DR;
+            sensitivity = "2x";
+        };
+    };
+};
+&CIRQUE_SOCKET { touchpad = <&CIRQUE_DEVICE>; };
+#undef CIRQUE_BUS
+#undef CIRQUE_SOCKET
+#undef CIRQUE_DEVICE
+#undef CIRQUE_SCL
+#undef CIRQUE_SDA
+#undef CIRQUE_DR
