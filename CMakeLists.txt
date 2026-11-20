@@ -27,3 +27,7 @@ endif()
 if(CONFIG_ZMK_STUDIO_RPC AND "cagime-sim-left" IN_LIST SNIPPET)
   target_sources(app PRIVATE tests/renode/uart_endpoint.c)
 endif()
+
+if(CONFIG_ZMK_ZEROSHIFT AND (CONFIG_SHIELD_CAGIME_AAA_LEFT OR CONFIG_SHIELD_CAGIME_AAA_RIGHT) AND NOT CONFIG_ZMK_SETTINGS_RESET_ON_START)
+  zephyr_linker_sources(ROM_START SORT_KEY 0x2volume src/uf2_volume_id.ld)
+endif()
