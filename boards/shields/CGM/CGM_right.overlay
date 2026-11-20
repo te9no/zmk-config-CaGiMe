@@ -68,3 +68,33 @@
 #include "cirque_slot.dtsi"
 &right_lower_pad { device = <&lower_cirque>; };
 &right_inner_pad { device = <&inner_cirque>; };
+
+/ {
+    lower_scroll: lower-dial-scroll {
+        compatible = "zmk,optical-dial-scroll";
+        #input-processor-cells = <0>;
+    };
+    split_inputs {
+        lower_dial_split: lower-dial@7 {
+            compatible = "zmk,input-split";
+            reg = <7>;
+            device = <&cagime_lower_pat>;
+            input-processors = <&lower_scroll>;
+        };
+    };
+};
+
+/ {
+    inner_scroll: inner-dial-scroll {
+        compatible = "zmk,optical-dial-scroll";
+        #input-processor-cells = <0>;
+    };
+    split_inputs {
+        inner_dial_split: inner-dial@8 {
+            compatible = "zmk,input-split";
+            reg = <8>;
+            device = <&cagime_inner_pat>;
+            input-processors = <&inner_scroll>;
+        };
+    };
+};

@@ -108,3 +108,47 @@
 / { right_lower_pad_listener { compatible = "zmk,input-listener"; device = <&right_lower_pad>; }; };
 / { left_inner_pad { compatible = "zmk,input-listener"; device = <&inner_cirque>; }; };
 / { right_inner_pad_listener { compatible = "zmk,input-listener"; device = <&right_inner_pad>; }; };
+
+/ {
+    lower_scroll: lower-dial-scroll {
+        compatible = "zmk,optical-dial-scroll";
+        #input-processor-cells = <0>;
+    };
+    split_inputs {
+        lower_dial_split: lower-dial@7 {
+            compatible = "zmk,input-split";
+            reg = <7>;
+        };
+    };
+    lower_local_wheel {
+        compatible = "zmk,input-listener";
+        device = <&cagime_lower_pat>;
+        input-processors = <&lower_scroll>;
+    };
+    lower_remote_wheel {
+        compatible = "zmk,input-listener";
+        device = <&lower_dial_split>;
+    };
+};
+
+/ {
+    inner_scroll: inner-dial-scroll {
+        compatible = "zmk,optical-dial-scroll";
+        #input-processor-cells = <0>;
+    };
+    split_inputs {
+        inner_dial_split: inner-dial@8 {
+            compatible = "zmk,input-split";
+            reg = <8>;
+        };
+    };
+    inner_local_wheel {
+        compatible = "zmk,input-listener";
+        device = <&cagime_inner_pat>;
+        input-processors = <&inner_scroll>;
+    };
+    inner_remote_wheel {
+        compatible = "zmk,input-listener";
+        device = <&inner_dial_split>;
+    };
+};

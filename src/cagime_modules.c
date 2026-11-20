@@ -12,7 +12,6 @@
 #include <zmk/matrix_transform.h>
 
 #include "cagime_stick.h"
-#include "dial_degrees.h"
 #include "modules_profile.h"
 
 LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
@@ -25,7 +24,6 @@ enum slot_index { LOWER_SLOT, INNER_SLOT };
 struct module_slot {
     uint8_t row, column, sensor_index;
     bool has_stick;
-    int32_t counts_per_turn;
     const struct device *bus;
     const struct device *pmw3610;
     const struct device *encoder;
@@ -48,7 +46,6 @@ struct module_slot {
     .encoder = SOCKET_DEVICE(n, encoder), .key = SOCKET_DEVICE(n, push_key), \
     .pad_bus = SOCKET_BUS(n, touchpad), .pad = SOCKET_DEVICE(n, touchpad), \
     .pat_bus = SOCKET_BUS(n, optical_dial), .pat = SOCKET_DEVICE(n, optical_dial), \
-    .counts_per_turn = DT_PROP_OR(n, counts_per_revolution, 0), \
     .lpps_bus = SOCKET_BUS(n, lpps_adc), .lpps_adc = SOCKET_DEVICE(n, lpps_adc), \
     .lpps_axes = SOCKET_DEVICE(n, lpps_axes), \
 }
@@ -122,33 +119,9 @@ static int start_encoder(const struct device *dev) {
     return err == 0 ? sensor_trigger_set(dev, &trigger, module_encoder_event) : err;
 }
 
-/* The input thread serializes the two optical streams. Each dial keeps its
- * own signed remainder so slow turns and reversals retain subdegree counts. */
-static int32_t dial_remainders[ARRAY_SIZE(slots)];
-
-static void dial_event(struct input_event *event, void *user_data) {
-    const struct module_slot *slot = user_data;
-    if (event->type != INPUT_EV_REL || event->code != INPUT_REL_X) {
-        return;
-    }
-    int32_t *remainder = &dial_remainders[slot - slots];
-    int32_t degrees = cagime_dial_degrees(event->value, slot->counts_per_turn, remainder);
-    if (degrees != 0) {
-        raise_zmk_sensor_event((struct zmk_sensor_event){
-            .sensor_index = slot->sensor_index,
-            .channel_data_size = 1,
-            .channel_data = {{.value = {.val1 = degrees}, .channel = SENSOR_CHAN_ROTATION}},
-            .timestamp = k_uptime_get(),
-        });
-    }
-}
-
 #define SOCKET_CALLBACKS(node, idx) \
-    BUILD_ASSERT(DT_PROP(node, counts_per_revolution) > 0); \
     INPUT_CALLBACK_DEFINE_NAMED(SOCKET_DEVICE(node, push_key), module_key_event, \
-                                (void *)&slots[idx], key_##idx); \
-    INPUT_CALLBACK_DEFINE_NAMED(SOCKET_DEVICE(node, optical_dial), dial_event, \
-                                (void *)&slots[idx], dial_##idx)
+                                (void *)&slots[idx], key_##idx)
 
 SOCKET_CALLBACKS(LOWER, LOWER_SLOT);
 #if DT_NODE_HAS_PROP(INNER, optical_dial)
