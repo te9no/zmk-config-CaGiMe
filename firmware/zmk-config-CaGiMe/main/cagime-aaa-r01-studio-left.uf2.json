@@ -1,11 +1,11 @@
 {
   "artifact": {
     "name": "cagime-aaa-r01-studio-left.uf2",
-    "sha256": "ee21523aa970d615370151ef90a364de950a506b93a904cf2db9f01edb1a1d42"
+    "sha256": "5c58a5acb1cb040d781aa624f8aec95922f41669ecdcdfa3e19d8ebcff25b770"
   },
   "generated": {
-    ".config": "039d6c1c07834bdc60511c4986d55d98689b395526428ddd4deb52e2b04236b4",
-    "zephyr.dts": "edaaf8ac92ef6a8ee1274c64f7c4ce34bf573c5e3f111859e4d2d53a976096ed"
+    ".config": "d190787f5d7d84452a14bf1b11887b2ca5967f7ca0484ca9895a0fef31f10d20",
+    "zephyr.dts": "69d7447e7ee950cb2534470a57070c5a1d23ca5feb1fb68f96abdb1c62cbf3da"
   },
   "inputs": {
     "dependencies": {
@@ -352,7 +352,7 @@
         "untracked": {}
       },
       "zmk-feature-zeroshift": {
-        "commit": "9c3d3aaded99e87f8c07186c1e7084aa3cac1e60",
+        "commit": "16a58f1f8de889a3a98ba8c450e312697e4b9050",
         "diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
         "dirty": false,
         "untracked": {}
@@ -377,7 +377,7 @@
       }
     },
     "source": {
-      "commit": "dd726014d666fb3b466f538f9aa7d018b47be22e",
+      "commit": "afb88e36e33175e7388a38013e7db14f29d39ed0",
       "diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "dirty": false,
       "untracked": {}
@@ -389,12 +389,12 @@
       "untracked": {}
     }
   },
-  "run_id": "44489573135",
+  "run_id": "44675495979",
   "schema": 1,
   "target": {
     "artifact-name": "cagime-aaa-r01-studio-left",
     "board": "xiao_ble//zmk",
-    "shield": "cagime_aaa_left cagime_aaa_left_j5",
+    "shield": "CGM_left",
     "snippet": "cagime-studio"
   }
 }

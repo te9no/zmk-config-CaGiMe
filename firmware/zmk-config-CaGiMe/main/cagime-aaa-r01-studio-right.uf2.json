@@ -1,11 +1,11 @@
 {
   "artifact": {
     "name": "cagime-aaa-r01-studio-right.uf2",
-    "sha256": "6a737676ae605b4b921c92df0de6a24eeaeec889c944165de7d67b8667536321"
+    "sha256": "671f225ab43915d5a42af87e19a4985b5c2906492d0675c58a8f9ebd4299560c"
   },
   "generated": {
-    ".config": "8a32a7f700794c4662445e163108dc049f86488017a128cad186211f43df32eb",
-    "zephyr.dts": "88c85c5e81ed0324681816d332ad3482a6c306bd5751ef9f4c98ac8f9abc2130"
+    ".config": "2ab85db9589ea30b969db529ad2bfef036f89bf1742310669772e6a47237d42d",
+    "zephyr.dts": "7cae729219fa7c53bf9e190556f1c4b6d595fd1904a11ff88ec0c0ca8889ce58"
   },
   "inputs": {
     "dependencies": {
@@ -352,7 +352,7 @@
         "untracked": {}
       },
       "zmk-feature-zeroshift": {
-        "commit": "9c3d3aaded99e87f8c07186c1e7084aa3cac1e60",
+        "commit": "16a58f1f8de889a3a98ba8c450e312697e4b9050",
         "diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
         "dirty": false,
         "untracked": {}
@@ -377,7 +377,7 @@
       }
     },
     "source": {
-      "commit": "dd726014d666fb3b466f538f9aa7d018b47be22e",
+      "commit": "afb88e36e33175e7388a38013e7db14f29d39ed0",
       "diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "dirty": false,
       "untracked": {}
@@ -389,12 +389,12 @@
       "untracked": {}
     }
   },
-  "run_id": "44489573135",
+  "run_id": "44675495979",
   "schema": 1,
   "target": {
     "artifact-name": "cagime-aaa-r01-studio-right",
     "board": "xiao_ble//zmk",
-    "shield": "cagime_aaa_right",
+    "shield": "CGM_right",
     "snippet": "cagime-relay"
   }
 }
