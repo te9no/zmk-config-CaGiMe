@@ -238,7 +238,7 @@ static int module_command(const struct shell *shell, size_t argc, char **argv) {
     }
 
     if (err == 0) {
-        const char *side = IS_ENABLED(CONFIG_SHIELD_CAGIME_AAA_LEFT) ? "left" : "right";
+        const char *side = IS_ENABLED(CONFIG_SHIELD_CGM_LEFT) ? "left" : "right";
         shell_print(shell, "CAGIME/2 state %s %s %s %s %s %u", side,
                     mode_names[state.saved[0]], mode_names[state.saved[1]],
                     mode_names[state.active[0]], mode_names[state.active[1]],

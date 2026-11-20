@@ -1,4 +1,4 @@
-#include "cagime_aaa.dtsi"
+#include "CGM.dtsi"
 #include "cagime_inner_pmw3610.dtsi"
 
 #define CAGIME_LPPS_PSELS <NRF_PSEL(SPIM_SCK, 0, 3)>, \

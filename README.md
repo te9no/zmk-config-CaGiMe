@@ -45,7 +45,7 @@ ZMK_FIRMWARE_TEST_PURPOSE=zeroshift-config-r01 \
 
 ## 実装と検証
 
-ピン配置とスロットの配線は [CaGiMe のシールド定義](boards/shields/cagime_aaa)、選択可能なモジュールと起動処理は [CaGiMe 側の実装](src/cagime_modules.c) にあります。選択の保存と次回起動時の適用には [ZeroShift](https://github.com/te9no/zmk-feature-zeroshift) を使っています。
+ピン配置とスロットの配線は [CaGiMe のシールド定義](boards/shields/CGM)、選択可能なモジュールと起動処理は [CaGiMe 側の実装](src/cagime_modules.c) にあります。選択の保存と次回起動時の適用には [ZeroShift](https://github.com/te9no/zmk-feature-zeroshift) を使っています。
 
 Renode で下側 5 択と中央 5 択の組み合わせを左右各 25 通り試験しました。各ケースで保存直後の値を読み戻し、対象側だけを再起動して、選んだドライバーが適用されたことを確認しています。ブラウザーの無線接続 と左右間の通信は模擬接続を使い、実機での USB・無線 通信とモジュールの物理入力は未検証です。[Renode テスト](tests/renode/test_studio.mjs)
 

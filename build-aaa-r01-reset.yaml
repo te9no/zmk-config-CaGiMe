@@ -1,7 +1,7 @@
 include:
   - board: xiao_ble//zmk
-    shield: cagime_aaa_left settings_reset
+    shield: CGM_left settings_reset
     artifact-name: cagime-aaa-r01-j5-reset-left
   - board: xiao_ble//zmk
-    shield: cagime_aaa_right settings_reset
+    shield: CGM_right settings_reset
     artifact-name: cagime-aaa-r01-j5-reset-right

@@ -1,4 +1,4 @@
-#include "cagime_aaa.dtsi"
+#include "CGM.dtsi"
 
 &cagime_led_test {
     power-gpios = <&gpio0 3 GPIO_ACTIVE_LOW>; /* JLC U103 pad 2 / D1 */

@@ -4,9 +4,9 @@ ASSERT(. - __rom_start_address <= 0x100, "UF2 identity overlaps vectors");
 . = . + (0x100 - (. - __rom_start_address));
 LONG(0x31444956) /* VID1 */
 LONG(0x535a424b) /* KBZS */
-#if defined(CONFIG_SHIELD_CAGIME_AAA_LEFT)
+#if defined(CONFIG_SHIELD_CGM_LEFT)
 LONG(0x024c)
-#elif defined(CONFIG_SHIELD_CAGIME_AAA_RIGHT)
+#elif defined(CONFIG_SHIELD_CGM_RIGHT)
 LONG(0x0252)
 #else
 #error Missing UF2 volume target
