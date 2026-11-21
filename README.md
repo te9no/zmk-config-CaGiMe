@@ -1,6 +1,8 @@
 # CaGiMe
 
-[今回の左右 UF2 を ZIP でダウンロード](firmware/downloads/CaGiMe-ZeroShift-common-r01.zip)。同じ ZIP の左右を対応する側に書き込み、設定した側を再起動してください。
+[今回の左右 UF2 を ZIP でダウンロード](firmware/downloads/CaGiMe-ZeroShift-unified-r01.zip)。同じ ZIP の左右を対応する側に書き込み、設定した側を再起動してください。
+
+スロット名と選択肢はキーボードの [config/zeroshift.json](config/zeroshift.json) に定義しています。親機に接続すると、共通 Web UI がその定義を読み込みます。
 
 CaGiMe は、左右それぞれの下側と中央に拡張モジュールを取り付けられる分割キーボードです。このリポジトリには、CaGiMe の ZMK 設定、キーマップ、拡張モジュールの配線・起動設定が入っています。
 
@@ -19,10 +21,7 @@ PAT は R02 の I²C 版（0x75）に対応します。回転は縦スクロー�
 
 左右それぞれに対応する Studio 版 UF2 を書き込みます。その後は、モジュールを交換しても同じ UF2 を使えます。モジュールを着脱するときは USB と電池を外してください。
 
-| 書き込み先 | UF2 |
-| --- | --- |
-| 左側（PC に接続する側） | [cagime-aaa-r01-studio-left.uf2](https://github.com/te9no/zmk-config-CaGiMe/raw/refs/heads/main/firmware/zmk-config-CaGiMe/main/cagime-aaa-r01-studio-left.uf2) |
-| 右側 | [cagime-aaa-r01-studio-right.uf2](https://github.com/te9no/zmk-config-CaGiMe/raw/refs/heads/main/firmware/zmk-config-CaGiMe/main/cagime-aaa-r01-studio-right.uf2) |
+ZIP 内の `cagime-aaa-r01-studio-left.uf2` を左に、`cagime-aaa-r01-studio-right.uf2` を右に書き込みます。
 
 <details>
 <summary>開発用ワークスペースで UF2 をビルドする</summary>
@@ -49,6 +48,6 @@ ZMK_FIRMWARE_TEST_PURPOSE=zeroshift-config-r01 \
 
 ピン配置とスロットの配線は [CaGiMe のシールド定義](boards/shields/CGM)、選択可能なモジュールと起動処理は [CaGiMe 側の実装](src/cagime_modules.c) にあります。選択の保存と次回起動時の適用には [ZeroShift](https://github.com/te9no/zmk-feature-zeroshift) を使っています。
 
-Renode で下側 5 択と中央 5 択の組み合わせを左右各 25 通り試験しました。各ケースで保存直後の値を読み戻し、対象側だけを再起動して、選んだドライバーが適用されたことを確認しています。ブラウザーの無線接続 と左右間の通信は模擬接続を使い、実機での USB・無線 通信とモジュールの物理入力は未検証です。[Renode テスト](tests/renode/test_studio.mjs)
+Renode で下部8択と中央7択を左右各56通り試し、保存値と対象側の再起動後の起動値を照合しました。PAT9125 と Cirque はセンサー応答を模擬していないため、保存値が残り、起動状態がオフになることを確認しています。物理入力と実機の USB・無線通信は実機確認の対象です。[Renode テスト](tests/renode/test_studio.mjs)
 
 Renode の Studio 試験には、上記の Web UI をビルドしてから `ZEROSHIFT_STUDIO_WEB` にその `studio-web` の絶対パスを指定できます。既定では、このリポジトリと同じ親ディレクトリの `zmk-feature-zeroshift/studio-web` を使います。
