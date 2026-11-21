@@ -47,3 +47,6 @@ config PM_DEVICE
     default y
 
 endif
+
+config ZMK_ZEROSHIFT_STUDIO
+    default y if SHIELD_CGM_LEFT && ZMK_STUDIO_RPC && !ZMK_SETTINGS_RESET_ON_START

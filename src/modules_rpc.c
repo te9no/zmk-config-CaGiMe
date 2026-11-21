@@ -1,41 +1,11 @@
 // SPDX-License-Identifier: MIT
-#include <pb_decode.h>
-#include <zmk/studio/custom.h>
-#include "modules.pb.h"
+#include <zeroshift/studio.h>
 #include "modules_profile.h"
 
-LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
-static struct zmk_rpc_custom_subsystem_meta meta = {.security = ZMK_STUDIO_RPC_HANDLER_UNSECURED};
-ZMK_RPC_CUSTOM_SUBSYSTEM(cagime__modules, &meta, handle);
-ZMK_RPC_CUSTOM_SUBSYSTEM_RESPONSE_BUFFER(cagime__modules, cagime_Response);
+const char zeroshift_studio_descriptor[] =
+#include "descriptor.inc"
+;
 
-static bool handle(const zmk_custom_CallRequest *raw, pb_callback_t *encode) {
-    cagime_Response *resp = ZMK_RPC_CUSTOM_SUBSYSTEM_RESPONSE_BUFFER_ALLOCATE(cagime__modules, encode);
-    *resp = (cagime_Response)cagime_Response_init_zero;
-    cagime_Request req = cagime_Request_init_zero;
-    pb_istream_t stream = pb_istream_from_buffer(raw->payload.bytes, raw->payload.size);
-    uint8_t modes[2];
-    bool decoded = pb_decode(&stream, cagime_Request_fields, &req);
-    bool write = req.which_operation == cagime_Request_set_tag;
-    if (!decoded || (!write && req.which_operation != cagime_Request_get_tag) ||
-        (write && (req.operation.set.lower > UINT8_MAX || req.operation.set.inner > UINT8_MAX))) {
-        resp->error = -EINVAL;
-        return true;
-    }
-    if (write) {
-        modes[0] = req.operation.set.lower;
-        modes[1] = req.operation.set.inner;
-    }
-    struct zeroshift_state state;
-    uint16_t supported = cagime_supported_modes();
-    resp->error = req.right ? cagime_remote_profile(write ? modes : NULL, &state, &supported)
-                            : zeroshift_profile(write ? modes : NULL, &state);
-    if (!resp->error) {
-        resp->has_supported = supported != 0;
-        resp->supported = (cagime_Modes){supported & 0xff, supported >> 8};
-        resp->has_saved = resp->has_active = true;
-        resp->saved = (cagime_Modes){state.saved[0], state.saved[1]};
-        resp->active = (cagime_Modes){state.active[0], state.active[1]};
-    }
-    return true;
+int zeroshift_studio_profile(bool right, const uint8_t *requested, struct zeroshift_state *state) {
+    return !right ? zeroshift_profile(requested, state) : cagime_remote_profile(requested, state);
 }

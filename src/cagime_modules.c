@@ -151,18 +151,6 @@ bool zeroshift_mode_supported(size_t slot, uint8_t mode) {
     }
 }
 
-uint16_t cagime_supported_modes(void) {
-    uint16_t mask = 0;
-    for (size_t slot = 0; slot < ARRAY_SIZE(slots); slot++) {
-        for (unsigned int mode = 0; mode < ARRAY_SIZE(mode_names); mode++) {
-            if (zeroshift_mode_supported(slot, mode)) {
-                mask |= BIT(slot * 8 + mode);
-            }
-        }
-    }
-    return mask;
-}
-
 static int parse_mode(const char *name, size_t slot) {
     for (size_t i = 0; i < ARRAY_SIZE(mode_names); i++) {
         if (strcmp(name, mode_names[i]) == 0 && zeroshift_mode_supported(slot, i)) {
