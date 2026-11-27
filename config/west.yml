@@ -2,7 +2,7 @@ manifest:
   projects:
     - name: zmk-feature-zeroshift
       url: https://github.com/te9no/zmk-feature-zeroshift
-      revision: 666ec6e8f91a2130e32c30cfc805c555de6a1d47
+      revision: 66248aa540c3897c154183848272eb32732e9781
     - name: zmk-module-bt-recovery
       url: https://github.com/te9no/zmk-module-bt-recovery
       revision: 7e76381d90856a42e739cebf66752afebbe78748
